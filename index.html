@@ -4,14 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Member Contributions</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
 </head>
 <body>
     <div class="container mt-5">
         <h2 class="text-center mb-4">Member Contributions</h2>
-        <table class="table table-bordered table-striped">
+        <table class="table table-bordered table-striped" id="membersTable">
             <thead class="thead-dark">
                 <tr>
                     <th>Name</th>
@@ -22,7 +24,7 @@
             </thead>
             <tbody id="memberData">
                 <tr>
-                    <td colspan="3" class="text-center">Loading data...</td>
+                    <td colspan="4" class="text-center">Loading data...</td>
                 </tr>
             </tbody>
         </table>
@@ -43,6 +45,18 @@
                     const tbody = $("#memberData");
                     tbody.empty(); // Clear loading row
 
+                    // Sort MM001, MM002, and MM003 to the top before adding data
+                    data.sort((a, b) => {
+                        const priorityAccounts = ["MM001", "MM002", "MM003"];
+                        const indexA = priorityAccounts.indexOf(a.account_number.toUpperCase());
+                        const indexB = priorityAccounts.indexOf(b.account_number.toUpperCase());
+
+                        // Prioritize MM001, MM002, and MM003 to always be at the top
+                        if (indexA !== -1 && indexB === -1) return -1;
+                        if (indexA === -1 && indexB !== -1) return 1;
+                        return 0; // If both or neither are priority, leave as is
+                    });
+
                     if (data.length > 0) {
                         data.forEach(member => {
                             const name = `${member.first_name} ${member.last_name}`;
@@ -59,15 +73,23 @@
                                 </tr>
                             `);
                         });
+
+                        // Initialize DataTables after data is loaded
+                        $('#membersTable').DataTable({
+                            "paging": true,
+                            "searching": true,
+                            "ordering": true,
+                            "order": [] // Keep no specific default ordering
+                        });
                     } else {
-                        tbody.append('<tr><td colspan="3" class="text-center">No data available.</td></tr>');
+                        tbody.append('<tr><td colspan="4" class="text-center">No data available.</td></tr>');
                     }
                 })
                 .catch(error => {
                     console.error("Error fetching data:", error);
                     const tbody = $("#memberData");
                     tbody.empty();
-                    tbody.append('<tr><td colspan="3" class="text-center">Failed to load data.</td></tr>');
+                    tbody.append('<tr><td colspan="4" class="text-center">Failed to load data.</td></tr>');
                 });
         });
     </script>
