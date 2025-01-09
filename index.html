@@ -15,8 +15,9 @@
             <thead class="thead-dark">
                 <tr>
                     <th>Name</th>
+                    <th>Account Number</th>
                     <th>Amount Raised (KES)</th>
-                    <th>Balance Left to 1700 (KES)</th>
+                    <th>Balance</th>
                 </tr>
             </thead>
             <tbody id="memberData">
@@ -46,11 +47,13 @@
                         data.forEach(member => {
                             const name = `${member.first_name} ${member.last_name}`;
                             const totalAmount = member.total_amount;
+                            const accountNumber = member.account_number;
                             const balanceLeft = 1700 - totalAmount;
 
                             tbody.append(`
                                 <tr>
                                     <td>${name}</td>
+                                    <td>${accountNumber}</td>
                                     <td>${totalAmount}</td>
                                     <td>${balanceLeft}</td>
                                 </tr>
